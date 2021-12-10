@@ -1,21 +1,44 @@
+import React, {useEffect} from 'react';
+import { StyleSheet, SafeAreaView } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import Constants from 'expo-constants';
+import Routes from './src/navigation';
+import ContextProvider from './src/contexts';
 
 export default function App() {
+
+  useEffect(() => {
+    // AsyncStorage.clear();
+    setEnvironment();
+  }, []);
+
+  const setEnvironment = async () => {
+    const users = await AsyncStorage.getItem("@ContatosEmergencia:users");
+    const contacts = await AsyncStorage.getItem("@ContatosEmergencia:contacts");
+
+    if (!users) {
+      await AsyncStorage.setItem("@ContatosEmergencia:users", JSON.stringify([]));
+    }
+
+    if (!contacts) {
+      await AsyncStorage.setItem("@ContatosEmergencia:contacts", JSON.stringify([]));
+    }
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <ContextProvider>
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="auto" />
+        <Routes />
+      </SafeAreaView>
+    </ContextProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: Constants.statusBarHeight,
   },
 });
